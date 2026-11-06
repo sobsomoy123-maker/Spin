@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#172554">
+<title>Spin & Learn | Classroom Picker</title>
+<style>
+:root{--navy:#172554;--blue:#2563eb;--sky:#dbeafe;--ink:#172033;--muted:#64748b;--paper:#f8fafc;--line:#e2e8f0;--green:#15803d;--orange:#ea580c;--pink:#db2777;--shadow:0 14px 40px #0f172a12}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#eff6ff,#f8fafc 55%,#fdf2f8);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--ink);min-height:100vh}
+header{background:var(--navy);color:white;padding:20px max(18px,calc((100vw - 1120px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:14px;background:#fff;color:var(--navy);display:grid;place-items:center;font-size:25px}.brand h1{font-size:21px;margin:0}.brand p{margin:3px 0 0;color:#bfdbfe;font-size:12px}.header-pill{border:1px solid #ffffff55;border-radius:99px;padding:8px 12px;font-size:12px;color:#dbeafe}
+main{max-width:1120px;margin:24px auto;padding:0 16px 40px}.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}.toolbar label{font-size:13px;font-weight:700;color:#334155}.toolbar select,.toolbar input{padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:white;font:inherit;min-width:150px}
+.tabs{display:flex;gap:8px;margin-left:auto}.tab{border:1px solid #cbd5e1;background:white;border-radius:11px;padding:10px 14px;font-weight:700;color:#475569;cursor:pointer}.tab.active{background:var(--blue);color:white;border-color:var(--blue)}
+.layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(290px,.85fr);gap:18px}.panel{background:white;border:1px solid #e8edf5;border-radius:20px;padding:20px;box-shadow:var(--shadow)}.panel h2{margin:0 0 5px;font-size:19px}.sub{color:var(--muted);font-size:13px;margin:0 0 16px}
+.stage{min-height:450px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden}.wheel-wrap{width:min(100%,390px);position:relative;margin:10px auto 18px}.pointer{position:absolute;z-index:3;left:50%;top:-7px;transform:translateX(-50%);width:0;height:0;border-left:17px solid transparent;border-right:17px solid transparent;border-top:31px solid #f97316;filter:drop-shadow(0 3px 2px #0003)}
+canvas{display:block;width:100%;height:auto;filter:drop-shadow(0 8px 10px #0f172a22)}.spin-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:76px;height:76px;border:7px solid white;border-radius:50%;background:var(--navy);color:white;font-size:13px;font-weight:900;box-shadow:0 3px 12px #0f172a44;pointer-events:none}
+.primary,.secondary,.danger{border:0;border-radius:12px;padding:12px 18px;font:inherit;font-weight:800;cursor:pointer;transition:.15s}.primary{background:var(--blue);color:white;box-shadow:0 5px 12px #2563eb30}.primary:hover{background:#1d4ed8;transform:translateY(-1px)}.secondary{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}.danger{background:#fff1f2;color:#be123c;border:1px solid #fecdd3}.primary:disabled,.secondary:disabled{opacity:.5;cursor:not-allowed;transform:none}.winner{margin-top:4px;text-align:center;min-height:62px}.winner strong{font-size:25px;color:var(--navy);display:block}.winner small{color:var(--muted)}
+.action-row{display:flex;justify-content:center;gap:9px;flex-wrap:wrap}.mystery{width:min(100%,360px);height:210px;border-radius:22px;background:linear-gradient(135deg,#1d4ed8,#7c3aed);color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 15px 28px #4338ca35;cursor:pointer;border:5px solid white;outline:1px solid #c7d2fe;transition:.2s}.mystery:hover{transform:translateY(-3px)}.mystery .big{font-size:54px}.mystery b{font-size:20px}.mystery span{font-size:12px;color:#dbeafe;margin-top:6px}.hidden{display:none!important}
+.side-stack{display:flex;flex-direction:column;gap:14px}.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}.field label{font-size:12px;font-weight:800;color:#475569}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 11px;font:inherit;background:white}.field textarea{min-height:116px;resize:vertical;line-height:1.5}.hint{font-size:11px;color:var(--muted);line-height:1.5}.list-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.count{font-size:12px;color:var(--muted)}.student-list{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:12px}.student-row{display:flex;justify-content:space-between;align-items:center;padding:9px 11px;border-bottom:1px solid #f1f5f9;font-size:13px}.student-row:last-child{border-bottom:0}.student-row .pts{font-weight:800;color:#b45309}.mini{border:0;background:#f1f5f9;border-radius:8px;padding:5px 8px;cursor:pointer;color:#475569}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:11px;text-align:center}.stat strong{display:block;font-size:21px;color:var(--navy)}.stat span{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.feedback{padding:12px;border-radius:12px;background:#f0fdf4;color:#166534;font-size:13px;font-weight:700;text-align:center;margin:12px 0 0;min-height:44px}.feedback.neutral{background:#eff6ff;color:#1d4ed8}.feedback.warn{background:#fff7ed;color:#9a3412}
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.team{border:1px solid var(--line);border-radius:14px;padding:13px;background:#fafcff}.team h3{margin:0 0 8px;font-size:15px}.team p{font-size:12px;color:var(--muted);margin:4px 0}.team-score{font-size:23px;font-weight:900;color:var(--navy)}.section-title{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 12px}.section-title h2{margin:0}.small-note{font-size:11px;color:var(--muted)}footer{text-align:center;color:#94a3b8;font-size:11px;padding:18px}
+.modal-backdrop{position:fixed;inset:0;background:#0f172a99;display:grid;place-items:center;padding:18px;z-index:10}.modal{background:white;border-radius:20px;padding:24px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 70px #0004}.modal .emoji{font-size:42px}.modal h2{font-size:25px;color:var(--navy);margin:8px 0}.modal p{color:var(--muted);font-size:13px}.modal-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.stage{min-height:410px}.tabs{margin-left:0;width:100%}.tab{flex:1}.panel{padding:16px}main{margin-top:16px}}
+@media(max-width:420px){header{padding:16px}.header-pill{display:none}.toolbar select{flex:1}.stats{gap:5px}.stat{padding:9px 5px}.stat strong{font-size:18px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><div class="logo">🎡</div><div><h1>Spin & Learn</h1><p>A happy classroom question picker</p></div></div>
+ <div class="header-pill">EVERY STUDENT GETS A CHANCE · NO PRESSURE</div>
+</header>
+<main>
+ <div class="toolbar">
+  <label for="classSelect">CLASS</label>
+  <select id="classSelect"><option value="Class 9">Class 9</option><option value="Class 10">Class 10</option><option value="My Class">My Class</option></select>
+  <button class="secondary" id="editClassBtn">Edit class names</button>
+  <div class="tabs"><button class="tab active" data-mode="wheel">🎡 Spin Wheel</button><button class="tab" data-mode="card">🃏 Mystery Card</button><button class="tab" data-mode="team">🏆 Team Challenge</button></div>
+ </div>
+ <div class="layout">
+  <section class="panel stage">
+   <div id="wheelView" style="width:100%">
+    <h2 style="text-align:center">Who's ready for a question?</h2><p class="sub" style="text-align:center">Give the wheel a spin. It's just a chance to learn!</p>
+    <div class="wheel-wrap"><div class="pointer"></div><canvas id="wheel" width="700" height="700" aria-label="Student name wheel"></canvas><button class="spin-center" id="spinBtn">SPIN!</button></div>
+    <div class="winner" id="wheelWinner"><small>Tap SPIN to choose a student</small></div>
+    <div class="action-row"><button class="primary" id="spinAgain">🎡 Spin the wheel</button></div>
+   </div>
+   <div id="cardView" class="hidden" style="width:100%;text-align:center">
+    <h2>Mystery Student Card</h2><p class="sub">Tap the card to reveal who's next!</p>
+    <button class="mystery" id="mysteryCard"><div class="big">❔</div><b>Who's next?</b><span>TAP TO REVEAL</span></button>
+    <div class="winner" id="cardWinner"><small>Your mystery student is waiting…</small></div>
+    <div class="action-row"><button class="secondary" id="drawCard">Draw another card</button></div>
+   </div>
+   <div id="teamView" class="hidden" style="width:100%">
+    <div class="section-title"><div><h2>Team Challenge</h2><p class="sub" style="margin:4px 0 0">Work together, learn together.</p></div><button class="secondary" id="newTeams">↻ Make teams</button></div>
+    <div class="team-grid" id="teamGrid"></div>
+    <div class="field" style="margin-top:14px"><label>POINTS TO AWARD</label><div class="action-row"><button class="secondary teamAward" data-points="1">+1 point</button><button class="secondary teamAward" data-points="2">+2 points</button><button class="secondary teamAward" data-points="3">+3 points</button></div></div>
+    <div class="hint">Select a team card first, then award points. Teams are shuffled randomly.</div>
+    <div class="feedback neutral" id="teamFeedback">Choose a team to award points.</div>
+   </div>
+   <div class="feedback neutral" id="feedback">A kind classroom is a brave classroom. 💙</div>
+  </section>
+  <aside class="side-stack">
+   <section class="panel">
+    <div class="section-title"><h2>Classroom dashboard</h2><span class="small-note">Saved on this device</span></div>
+    <div class="stats"><div class="stat"><strong id="studentCount">0</strong><span>Students</span></div><div class="stat"><strong id="pickedCount">0</strong><span>Picked</span></div><div class="stat"><strong id="starCount">0</strong><span>Total stars</span></div></div>
+   </section>
+   <section class="panel">
+    <div class="section-title"><h2>Student list</h2><span class="count" id="listCount">0 names</span></div>
+    <div class="field"><label for="namesInput">ONE STUDENT PER LINE</label><textarea id="namesInput" placeholder="Ayesha&#10;Rahim&#10;Nusrat&#10;Sakib"></textarea><div class="hint">Edit the names, then press Save names. Your list stays saved in this browser.</div></div>
+    <div class="action-row" style="justify-content:flex-start"><button class="primary" id="saveNames">Save names</button><button class="secondary" id="resetPicked">Reset round</button></div>
+    <div class="feedback neutral" id="listFeedback">Add your students' names to begin.</div>
+   </section>
+   <section class="panel">
+    <div class="section-title"><h2>Stars & participation</h2><span class="count">⭐ Points</span></div>
+    <div class="student-list" id="scoreList"><div class="student-row">No students yet.</div></div>
+    <div class="hint" style="margin-top:9px">After a student answers, award a star from the result pop-up. You can also adjust stars here.</div>
+   </section>
+  </aside>
+ </div>
+</main>
+<footer>Spin & Learn · Encourage effort, celebrate progress · No student is ever penalized for passing.</footer>
+<div id="resultModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalName">
+ <div class="modal"><div class="emoji">🌟</div><p>YOUR NEXT LEARNER</p><h2 id="modalName">Student</h2><p id="modalMessage">Take your time. You can ask for a hint or pass.</p><div class="modal-actions"><button class="primary" id="awardStar">⭐ Award 1 star</button><button class="secondary" id="passStudent">↪ Pass kindly</button><button class="secondary" id="closeModal">Close</button></div></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const COLORS = ["#2563eb","#7c3aed","#db2777","#ea580c","#0f766e","#ca8a04","#0891b2","#9333ea","#16a34a","#e11d48"];
+const defaultData = {
+ "Class 9":["Ayesha","Rahim","Nusrat","Sakib","Mim","Hasan","Sumaiya","Tanvir"],
+ "Class 10":["Anika","Fahim","Jannat","Rafi","Sadia","Nabil","Tanjim","Mahi"],
+ "My Class":[]
+};
+let data = loadData(), currentClass = "Class 9", selectedName = null, selectedTeam = null, teams = [], angle = 0, spinning = false;
+function loadData(){try{return JSON.parse(localStorage.getItem("spinLearnData")) || structuredClone(defaultData)}catch(e){return JSON.parse(JSON.stringify(defaultData))}}
+function save(){localStorage.setItem("spinLearnData",JSON.stringify(data))}
+function roster(){return data[currentClass] || []}
+function ensureScores(){roster().forEach(n=>{if(!data.scores)data.scores={};if(!data.scores[currentClass])data.scores[currentClass]={};if(data.scores[currentClass][n]===undefined)data.scores[currentClass][n]=0})}
+function picked(){if(!data.picked)data.picked={};if(!data.picked[currentClass])data.picked[currentClass]=[];return data.picked[currentClass]}
+function setFeedback(msg,type="neutral"){const el=$("feedback");el.textContent=msg;el.className="feedback "+type}
+function refresh(){
+ ensureScores();$("namesInput").value=roster().join("\n");$("studentCount").textContent=roster().length;$("pickedCount").textContent=picked().length;
+ const scores=data.scores?.[currentClass]||{};const total=Object.values(scores).reduce((a,b)=>a+b,0);$("starCount").textContent=total;$("listCount").textContent=roster().length+" names";
+ $("scoreList").innerHTML=roster().length?roster().map(n=>`<div class="student-row"><span>${esc(n)}</span><span><b class="pts">⭐ ${scores[n]||0}</b> <button class="mini" data-up="${attr(n)}" title="Add a star">+</button> <button class="mini" data-down="${attr(n)}" title="Remove a star">−</button></span></div>`).join(""):'<div class="student-row">No students yet.</div>';
+ $("scoreList").querySelectorAll("[data-up]").forEach(b=>b.onclick=()=>changeScore(b.dataset.up,1));$("scoreList").querySelectorAll("[data-down]").forEach(b=>b.onclick=()=>changeScore(b.dataset.down,-1));
+ drawWheel();if($("teamView").classList.contains("hidden")===false)renderTeams();
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function attr(s){return esc(s).replace(/`/g,"&#96;")}
+function changeScore(n,delta){ensureScores();data.scores[currentClass][n]=Math.max(0,(data.scores[currentClass][n]||0)+delta);save();refresh()}
+function drawWheel(){
+ const c=$("wheel"),ctx=c.getContext("2d"),names=roster(),cx=350,cy=350,r=330;ctx.clearRect(0,0,700,700);
+ if(!names.length){ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle="#e2e8f0";ctx.fill();ctx.fillStyle="#64748b";ctx.font="bold 28px Arial";ctx.textAlign="center";ctx.fillText("Add student names",cx,cy);return}
+ const step=Math.PI*2/names.length;
+ names.forEach((n,i)=>{let start=angle+i*step;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,start,start+step);ctx.closePath();ctx.fillStyle=COLORS[i%COLORS.length];ctx.fill();ctx.strokeStyle="white";ctx.lineWidth=4;ctx.stroke();ctx.save();ctx.translate(cx,cy);ctx.rotate(start+step/2);ctx.textAlign="right";ctx.fillStyle="white";ctx.font=`bold ${names.length>12?18:22}px Arial`;let label=n.length>17?n.slice(0,15)+"…":n;ctx.fillText(label,r-24,7);ctx.restore()});
+ ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle="white";ctx.lineWidth=10;ctx.stroke();
+}
+function available(){const names=roster();if(!names.length)return[];const remaining=names.filter(n=>!picked().includes(n));return remaining.length?remaining:names}
+function chooseRandom(){const a=available();if(!a.length){setFeedback("Please add student names first.","warn");return null}return a[Math.floor(Math.random()*a.length)]}
+function showResult(name){if(!name)return;selectedName=name;$("modalName").textContent=name;$("modalMessage").textContent=picked().includes(name)?"Everyone has had a turn. This is a fresh round!":"Take your time. You can ask for a hint or pass."; $("resultModal").classList.remove("hidden")}
+function markPicked(name){if(!picked().includes(name))picked().push(name);save();refresh()}
+function spin(){
+ if(spinning)return;const names=roster();if(!names.length){setFeedback("Add student names before spinning.","warn");return}
+ const target=chooseRandom();if(!target)return;const idx=names.indexOf(target),step=Math.PI*2/names.length;
+ // Pointer is at top (-PI/2). Wheel segment center must land there.
+ const desired=-Math.PI/2-(idx+.5)*step;let delta=((desired-angle)%(Math.PI*2)+Math.PI*2)%(Math.PI*2)+Math.PI*2*5;
+ spinning=true;$("spinBtn").disabled=$("spinAgain").disabled=true;const start=angle,begin=performance.now(),duration=3600;
+ function frame(now){let t=Math.min(1,(now-begin)/duration),ease=1-Math.pow(1-t,4);angle=start+delta*ease;drawWheel();if(t<1)requestAnimationFrame(frame);else{angle=((angle%(Math.PI*2))+Math.PI*2)%(Math.PI*2);spinning=false;$("spinBtn").disabled=$("spinAgain").disabled=false;$("wheelWinner").innerHTML=`<strong>${esc(target)}</strong><small>It's your turn — you've got this!</small>`;markPicked(target);showResult(target);setFeedback("A new chance to learn. Be kind and cheer each other on! 💙","neutral")}}
+ requestAnimationFrame(frame);
+}
+function revealCard(){const n=chooseRandom();if(!n)return;$("mysteryCard").innerHTML=`<div class="big">🎉</div><b>${esc(n)}</b><span>YOU'RE UP NEXT!</span>`;$("cardWinner").innerHTML=`<strong>${esc(n)}</strong><small>Take your time. Everyone is here to help.</small>`;markPicked(n);showResult(n);setFeedback("Remember: trying is more important than being perfect.","neutral")}
+function switchMode(mode){document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode));$("wheelView").classList.toggle("hidden",mode!=="wheel");$("cardView").classList.toggle("hidden",mode!=="card");$("teamView").classList.toggle("hidden",mode!=="team");if(mode==="team"&&!teams.length)makeTeams()}
+function makeTeams(){const a=[...roster()].sort(()=>Math.random()-.5);teams=[[],[]];a.forEach((n,i)=>teams[i%2].push(n));selectedTeam=null;renderTeams();$("teamFeedback").textContent="Choose a team card to award points."}
+function renderTeams(){if(!teams.length){$("teamGrid").innerHTML="Add students to create teams.";return}const names=["Team Blue","Team Purple"],colors=["#eff6ff","#f5f3ff"];$("teamGrid").innerHTML=teams.map((t,i)=>{const score=data.teamScores?.[currentClass]?.[i]||0;return `<div class="team" data-team="${i}" style="background:${colors[i]};border-color:${selectedTeam===i?"#2563eb":"#e2e8f0"};outline:${selectedTeam===i?"2px solid #2563eb":"none"};cursor:pointer"><h3>${names[i]}</h3><div class="team-score">⭐ ${score}</div><p>${t.length?t.map(esc).join(", "):"No students yet"}</p><p>${selectedTeam===i?"Selected ✓":"Tap to select"}</p></div>`}).join("");$("teamGrid").querySelectorAll("[data-team]").forEach(el=>el.onclick=()=>{selectedTeam=Number(el.dataset.team);renderTeams();$("teamFeedback").textContent=names[selectedTeam]+" selected. Choose points to award."})}
+function awardTeam(points){if(selectedTeam===null){$("teamFeedback").textContent="Select Team Blue or Team Purple first.";return}if(!data.teamScores)data.teamScores={};if(!data.teamScores[currentClass])data.teamScores[currentClass]={};data.teamScores[currentClass][selectedTeam]=(data.teamScores[currentClass][selectedTeam]||0)+points;save();renderTeams();$("teamFeedback").textContent=`⭐ ${points} point${points>1?"s":""} awarded to Team ${selectedTeam===0?"Blue":"Purple"}!`}
+$("spinBtn").onclick=spin;$("spinAgain").onclick=spin;$("mysteryCard").onclick=revealCard;$("drawCard").onclick=revealCard;
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>switchMode(b.dataset.mode));
+$("classSelect").onchange=e=>{currentClass=e.target.value;selectedName=null;teams=[];$("wheelWinner").innerHTML="<small>Tap SPIN to choose a student</small>";$("cardWinner").innerHTML="<small>Your mystery student is waiting…</small>";$("mysteryCard").innerHTML="<div class=\'big\'>❔</div><b>Who\'s next?</b><span>TAP TO REVEAL</span>";refresh();setFeedback("Switched to "+currentClass+".","neutral")};
+$("saveNames").onclick=()=>{const names=$("namesInput").value.split(/\n|,/).map(s=>s.trim()).filter(Boolean);data[currentClass]=[...new Set(names)];if(data.picked)data.picked[currentClass]=[];teams=[];save();refresh();$("listFeedback").textContent="Names saved! The round has been reset.";setFeedback("Your class list is ready. Let the learning begin!","neutral")};
+$("resetPicked").onclick=()=>{if(data.picked)data.picked[currentClass]=[];save();refresh();setFeedback("Round reset. Everyone gets a fresh chance!","neutral")};
+$("editClassBtn").onclick=()=>{const current=$("classSelect").value;const name=prompt("Enter a class name (for example: Class 8):",current);if(!name||!name.trim())return;const clean=name.trim();if(data[clean]){alert("That class already exists.");return}data[clean]=[...roster()];$("classSelect").add(new Option(clean,clean));$("classSelect").value=clean;currentClass=clean;save();refresh()};
+$("awardStar").onclick=()=>{if(!selectedName)return;changeScore(selectedName,1);markPicked(selectedName);$("resultModal").classList.add("hidden");setFeedback("⭐ Great effort, "+selectedName+"! One star earned.","neutral")};
+$("passStudent").onclick=()=>{if(selectedName)markPicked(selectedName);$("resultModal").classList.add("hidden");setFeedback("No problem! Passing is okay. Let's give someone else a turn. 💙","neutral")};
+$("closeModal").onclick=()=>$("resultModal").classList.add("hidden");$("resultModal").onclick=e=>{if(e.target===$("resultModal"))$("resultModal").classList.add("hidden")};
+document.querySelectorAll(".teamAward").forEach(b=>b.onclick=()=>awardTeam(Number(b.dataset.points)));
+$("newTeams").onclick=makeTeams;
+refresh();
+</script>
+</body>
+</html>
